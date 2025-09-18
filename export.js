@@ -9,53 +9,43 @@ const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
-  await page.setViewport({ width: 200, height: 60, deviceScaleFactor: 2 });
+  await page.setViewport({ width: 240, height: 80, deviceScaleFactor: 4 });
   await page.goto(`file://${path.join(process.cwd(), "buttons.html")}`, {
     waitUntil: "networkidle0",
   });
-  await page.emulateMediaType("screen");
 
-  const selector = "#button";
-  await page.waitForSelector(selector);
+  async function screenshotButton(id, outFile, hover = false) {
+    const el = await page.$(id);
+    if (!el) throw new Error(`No element with selector ${id}`);
 
-  const clip = await page.$eval(selector, (el) => {
-    const r = el.getBoundingClientRect();
-    return {
-      x: Math.floor(r.x),
-      y: Math.floor(r.y),
-      width: Math.ceil(r.width),
-      height: Math.ceil(r.height),
-    };
-  });
+    const box = await el.boundingBox();
+    if (hover) {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await new Promise((r) => setTimeout(r, 250));
+    }
 
-  await page.screenshot({
-    path: path.join(outDir, "website_button_normal.png"),
-    omitBackground: true,
-    clip,
-  });
+    await page.screenshot({
+      path: path.join(outDir, outFile),
+      omitBackground: true,
+      clip: {
+        x: Math.floor(box.x),
+        y: Math.floor(box.y),
+        width: Math.ceil(box.width),
+        height: Math.ceil(box.height),
+      },
+    });
 
-  await page.goto(
-    `file://${path.join(process.cwd(), "buttons.html")}?state=hover`,
-    { waitUntil: "networkidle0" }
-  );
-  await page.waitForSelector(selector);
-  const clip2 = await page.$eval(selector, (el) => {
-    const r = el.getBoundingClientRect();
-    return {
-      x: Math.floor(r.x),
-      y: Math.floor(r.y),
-      width: Math.ceil(r.width),
-      height: Math.ceil(r.height),
-    };
-  });
-  await page.screenshot({
-    path: path.join(outDir, "website_button_hover.png"),
-    omitBackground: true,
-    clip: clip2,
-  });
+    if (hover) {
+      await page.mouse.move(0, 0);
+    }
+  }
+
+  //   await screenshotButton("#official", "official_normal.png");
+  //   await screenshotButton("#official", "official_hover.png", true);
+
+  await screenshotButton("#discord", "discord_normal.png");
+  await screenshotButton("#discord", "discord_hover.png", true);
 
   await browser.close();
-  console.log(
-    "Saved to ./out/website_button_normal.png and ./out/website_button_hover.png"
-  );
+  console.log("Screenshots saved in ./out/");
 })();
