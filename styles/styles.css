@@ -23,7 +23,6 @@ body {
   height: var(--h);
   min-width: var(--w);
   padding: 0 18px;
-  border-radius: var(--radius);
   color: var(--text);
   font-size: 17px;
   font-weight: 700;

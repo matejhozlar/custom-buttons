@@ -40,11 +40,11 @@ const puppeteer = require("puppeteer");
     }
   }
 
-  await screenshotButton("#official", "official_normal.png");
-  await screenshotButton("#official", "official_hover.png", true);
+  // await screenshotButton("#official", "official_normal.png");
+  // await screenshotButton("#official", "official_hover.png", true);
 
-  // await screenshotButton("#discord", "discord_normal.png");
-  // await screenshotButton("#discord", "discord_hover.png", true);
+  await screenshotButton("#discord", "discord_normal.png");
+  await screenshotButton("#discord", "discord_hover.png", true);
 
   await browser.close();
   console.log("Screenshots saved in ./out/");
