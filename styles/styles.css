@@ -11,7 +11,7 @@
 }
 
 body {
-  background: #1e1e1e;
+  background: transparent;
   padding: 40px;
   font-family: var(--font);
 }
